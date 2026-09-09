@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from drf_spectacular.utils import extend_schema
 
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -9,6 +9,11 @@ from rest_framework.response import Response
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 
 
+@extend_schema(
+    request=RegisterSerializer,
+    responses={201: UserSerializer},
+    description='Register a new user and receive an authentication token.',
+)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_view(request):
@@ -23,6 +28,11 @@ def register_view(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    request=LoginSerializer,
+    responses={200: UserSerializer},
+    description='Login using email and password and receive an authentication token.',
+)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
@@ -36,16 +46,24 @@ def login_view(request):
         )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+@extend_schema(
+    responses={200: dict},
+    description='Logout the currently authenticated user.',
+)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
     request.user.auth_token.delete()
     return Response({'detail': 'Logged out successfully.'}, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    responses={200: UserSerializer},
+    description='Get the profile of the currently authenticated user.',
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile_view(request):
-    return Response(UserSerializer(request.user).data, status=status.HTTP_200_OK)
-# Create your views here.
+    return Response(
+        UserSerializer(request.user).data,
+        status=status.HTTP_200_OK,
+    )

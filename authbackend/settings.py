@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
     'accounts',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -82,6 +83,23 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'My API',
+    'DESCRIPTION': 'API documentation',
+    'VERSION': '1.0.0',
+
+    'APPEND_COMPONENTS': {
+        'securitySchemes': {
+            'tokenAuth': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'Authorization',
+            },
+        },
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
