@@ -2,7 +2,8 @@ from drf_spectacular.utils import extend_schema
 
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
@@ -66,4 +67,48 @@ def profile_view(request):
     return Response(
         UserSerializer(request.user).data,
         status=status.HTTP_200_OK,
+    )
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+from authbackend.storage import upload_file
+
+@extend_schema(
+    request={
+        "multipart/form-data": {
+            "type": "object",
+            "properties": {
+                "file": {
+                    "type": "string",
+                    "format": "binary",
+                }
+            },
+            "required": ["file"],
+        }
+    },
+    responses={201: dict},
+)
+@api_view(["POST"])
+@parser_classes([MultiPartParser])
+def upload_file_view(request):
+
+    file = request.FILES.get("file")
+
+    if not file:
+        return Response(
+            {"error": "No file provided"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    path = upload_file(file)
+
+    return Response(
+        {
+            "message": "File uploaded successfully",
+            "path": path,
+        },
+        status=status.HTTP_201_CREATED,
     )
