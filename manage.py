@@ -6,11 +6,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
-<<<<<<< HEAD
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Cloud_Computing_Backend.settings")
-=======
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'authbackend.settings')
->>>>>>> authentication
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -22,9 +18,5 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-<<<<<<< HEAD
-if __name__ == "__main__":
-=======
 if __name__ == '__main__':
->>>>>>> authentication
     main()
