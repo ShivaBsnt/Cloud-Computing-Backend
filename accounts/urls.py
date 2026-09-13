@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import upload_file_view
 
 urlpatterns = [
     path('register/', views.register_view, name='register'),
@@ -10,4 +11,6 @@ urlpatterns = [
     path('profile/upload-picture/', views.upload_profile_picture_view, name='profile-upload-picture'),
     path('profile/change-password/', views.change_password_view, name='profile-change-password'),
     path('profile/delete/', views.delete_account_view, name='profile-delete'),
+
+    path('upload/', upload_file_view, name='upload-file'),
 ]

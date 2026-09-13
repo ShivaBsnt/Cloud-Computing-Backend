@@ -15,6 +15,7 @@ from .serializers import (
     ChangePasswordSerializer,
 )
 from .supabase_storage import upload_profile_picture
+from authbackend.storage import upload_file
 
 
 @extend_schema(
@@ -164,3 +165,42 @@ def delete_account_view(request):
     user = request.user
     user.delete()
     return Response({'detail': 'Account deleted successfully.'}, status=status.HTTP_200_OK)
+
+
+@extend_schema(
+    request={
+        "multipart/form-data": {
+            "type": "object",
+            "properties": {
+                "file": {
+                    "type": "string",
+                    "format": "binary",
+                }
+            },
+            "required": ["file"],
+        }
+    },
+    responses={201: dict},
+    description='Upload a general file (not a profile picture) to cloud storage.',
+)
+@api_view(["POST"])
+@parser_classes([MultiPartParser])
+@permission_classes([IsAuthenticated])
+def upload_file_view(request):
+    file = request.FILES.get("file")
+
+    if not file:
+        return Response(
+            {"error": "No file provided"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    path = upload_file(file)
+
+    return Response(
+        {
+            "message": "File uploaded successfully",
+            "path": path,
+        },
+        status=status.HTTP_201_CREATED,
+    )

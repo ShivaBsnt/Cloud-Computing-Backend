@@ -29,7 +29,10 @@ INSTALLED_APPS = [
     'corsheaders',
 
     'accounts',
+    'exercises',
+    'schedule',
     'drf_spectacular',
+    'supabase'
 ]
 
 MIDDLEWARE = [
