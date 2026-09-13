@@ -19,6 +19,7 @@ from authbackend.storage import upload_file
 
 
 @extend_schema(
+tags=["user"],
     request=RegisterSerializer,
     responses={201: UserSerializer},
     description='Register a new user and receive an authentication token.',
@@ -38,6 +39,7 @@ def register_view(request):
 
 
 @extend_schema(
+tags=["user"],
     request=LoginSerializer,
     responses={200: UserSerializer},
     description='Login using username and password and receive an authentication token.',
@@ -57,6 +59,7 @@ def login_view(request):
 
 
 @extend_schema(
+tags=["user"],
     responses={200: dict},
     description='Logout the currently authenticated user.',
 )
@@ -69,10 +72,12 @@ def logout_view(request):
 
 @extend_schema_view(
     get=extend_schema(
+tags=["user"],
         description="Retrieve the logged-in user's profile",
         responses={200: ProfileSerializer},
     ),
     patch=extend_schema(
+tags=["user"],
         description="Update bio, phone, name, or email",
         request=ProfileSerializer,
         responses={200: ProfileSerializer},
@@ -98,6 +103,7 @@ def profile_detail_view(request):
 
 
 @extend_schema(
+tags=["user"],
     request={
         'multipart/form-data': {
             'type': 'object',
@@ -134,6 +140,7 @@ def upload_profile_picture_view(request):
 
 
 @extend_schema(
+tags=["user"],
     request=ChangePasswordSerializer,
     responses={200: dict},
     description='Change the current password. Invalidates the existing token.',
@@ -156,6 +163,7 @@ def change_password_view(request):
 
 
 @extend_schema(
+tags=["user"],
     responses={200: dict},
     description='Permanently delete the currently authenticated user\'s account.',
 )
