@@ -6,10 +6,16 @@ from .models import Profile
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=6)
     confirm_password = serializers.CharField(write_only=True, min_length=6)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
         fields = ('username', 'email', 'password', 'confirm_password')
+
+    def validate_email(self, value):
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError('An account with this email already exists.')
+        return value
 
     def validate(self, data):
         if data['password'] != data['confirm_password']:
@@ -22,25 +28,34 @@ class RegisterSerializer(serializers.ModelSerializer):
         validated_data.pop('confirm_password')
         user = User.objects.create_user(
             username=validated_data['username'],
-            email=validated_data.get('email', ''),
+            email=validated_data['email'],
             password=validated_data['password'],
         )
         return user
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    identifier = serializers.CharField(help_text="Username or email address")
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        user = authenticate(
-            username=data.get('username'),
-            password=data.get('password'),
-        )
+        identifier = data.get('identifier')
+        password = data.get('password')
+        try:
+            if '@' in identifier:
+                user_obj = User.objects.get(email__iexact=identifier)
+            else:
+                user_obj = User.objects.get(username__iexact=identifier)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('Invalid username/email or password.')
+
+        user = authenticate(username=user_obj.username, password=password)
+
         if not user:
-            raise serializers.ValidationError('Invalid username or password.')
+            raise serializers.ValidationError('Invalid username/email or password.')
         if not user.is_active:
             raise serializers.ValidationError('This account is disabled.')
+
         data['user'] = user
         return data
 

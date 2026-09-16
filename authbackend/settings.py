@@ -31,8 +31,7 @@ INSTALLED_APPS = [
     'accounts',
     'exercises',
     'schedule',
-    'drf_spectacular',
-    'supabase'
+    'drf_spectacular'
 ]
 
 MIDDLEWARE = [
